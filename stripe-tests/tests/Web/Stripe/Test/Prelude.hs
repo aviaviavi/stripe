@@ -1,13 +1,13 @@
-{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveFunctor             #-}
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE RebindableSyntax #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE FlexibleContexts          #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE NoImplicitPrelude         #-}
+{-# LANGUAGE RankNTypes                #-}
+{-# LANGUAGE RebindableSyntax          #-}
+{-# LANGUAGE TypeFamilies              #-}
+{-# LANGUAGE TypeSynonymInstances      #-}
+{-# LANGUAGE UndecidableInstances      #-}
 module Web.Stripe.Test.Prelude
        ( ($)
        , (-&-)
@@ -38,17 +38,20 @@ module Web.Stripe.Test.Prelude
        , StripeSpec
        ) where
 
-import           Data.Aeson      (Value, Result(..), FromJSON, fromJSON)
-import           Data.Either     (Either)
-import           Data.String     (fromString)
-import           Data.Maybe      (Maybe(..))
-import           GHC.Num         (fromInteger)
-import           Prelude         (Bool(..), Eq(..), Functor(..), ($), IO, Char, String, error, undefined, (.), id, length)
+import qualified Control.Monad            as M
+import qualified Control.Monad.Trans      as M
+import           Control.Monad.Trans.Free (FreeT (..), liftF)
+import           Data.Aeson               (FromJSON, Result (..), Value,
+                                           fromJSON)
+import           Data.Either              (Either)
+import           Data.Maybe               (Maybe (..))
+import           Data.String              (fromString)
+import           GHC.Num                  (fromInteger)
+import           Prelude                  (Bool (..), Char, Eq (..),
+                                           Functor (..), IO, String, error, id,
+                                           length, undefined, ($), (.))
 import           Test.Hspec
-import           Test.Hspec.Core.Spec (SpecM)
-import qualified Control.Monad       as M
-import qualified Control.Monad.Trans as M
-import           Control.Monad.Trans.Free (FreeT(..), liftF)
+import           Test.Hspec.Core.Spec     (SpecM)
 import           Web.Stripe.Client
 
 ------------------------------------------------------------------------------
@@ -66,8 +69,8 @@ toStripeRequestF
     :: (FromJSON ret, StripeReturn req ~ ret)
     => StripeRequest req
     -> StripeRequestF ret
-toStripeRequestF (StripeRequest m e q) =
-  StripeRequestF (StripeRequest m e q) fromJSON
+toStripeRequestF (StripeRequest m h e q a) =
+  StripeRequestF (StripeRequest m h e q a) fromJSON
 
 type Stripe = FreeT StripeRequestF IO
 type StripeSpec = (forall a. Stripe a -> IO (Either StripeError a)) -> Spec

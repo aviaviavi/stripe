@@ -81,27 +81,26 @@ module Web.Stripe.Charge
     , TokenId       (..)
     ) where
 
-import           Web.Stripe.StripeRequest   (Method (GET, POST),
-                                             StripeHasParam, ToStripeParam(..),
-                                             StripeRequest (..), StripeReturn,
-                                             mkStripeRequest)
-import           Web.Stripe.Util            ((</>))
-import           Web.Stripe.Types           (Amount(..), ApplicationFeeAmount(..),
-                                             CVC (..),
-                                             Capture(..),
-                                             CardNumber (..), Charge (..),
-                                             ChargeId (..), Created(..),
-                                             Currency (..), Customer(..),
-                                             CustomerId (..), Description(..),
-                                             EndingBefore(..), ExpMonth (..),
-                                             ExpYear (..), Limit(..), MetaData(..),
-                                             NewCard(..), Email (..),
-                                             StartingAfter(..),
-                                             ReceiptEmail(..),
-                                             StatementDescription(..),
-                                             ExpandParams(..),
-                                             StripeList (..), TokenId (..))
-import           Web.Stripe.Types.Util      (getChargeId)
+import           Web.Stripe.StripeRequest (Method (GET, POST), StripeHasParam,
+                                           StripeRequest (..), StripeReturn,
+                                           ToStripeParam (..), mkStripeRequest)
+import           Web.Stripe.Types         (Amount (..),
+                                           ApplicationFeeAmount (..), CVC (..),
+                                           Capture (..), CardNumber (..),
+                                           Charge (..), ChargeId (..),
+                                           Created (..), Currency (..),
+                                           Customer (..), CustomerId (..),
+                                           Description (..), Email (..),
+                                           EndingBefore (..), ExpMonth (..),
+                                           ExpYear (..), ExpandParams (..),
+                                           Limit (..), MetaData (..),
+                                           NewCard (..), ReceiptEmail (..),
+                                           StartingAfter (..),
+                                           StatementDescription (..),
+                                           StripeList (..), TokenId (..),
+                                           TransferDestination (..))
+import           Web.Stripe.Types.Util    (getChargeId)
+import           Web.Stripe.Util          ((</>))
 
 ------------------------------------------------------------------------------
 -- | Create a `Charge`
@@ -130,6 +129,7 @@ instance StripeHasParam CreateCharge Capture
 instance StripeHasParam CreateCharge StatementDescription
 instance StripeHasParam CreateCharge ReceiptEmail
 instance StripeHasParam CreateCharge ApplicationFeeAmount
+instance StripeHasParam CreateCharge TransferDestination
 
 ------------------------------------------------------------------------------
 -- | Retrieve a `Charge` by `ChargeId`
