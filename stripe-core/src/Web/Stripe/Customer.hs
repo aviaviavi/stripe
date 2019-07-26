@@ -36,6 +36,7 @@ module Web.Stripe.Customer
       ---- * Update customer
     , UpdateCustomer
     , updateCustomer
+    , updateCustomerSource
       ---- * Delete customer
     , DeleteCustomer
     , deleteCustomer
@@ -70,23 +71,26 @@ module Web.Stripe.Customer
     , TrialEnd           (..)
     ) where
 
-import           Web.Stripe.StripeRequest   (Method (GET, POST, DELETE),
-                                             StripeHasParam, StripeRequest (..),
-                                             StripeReturn, mkStripeRequest)
-import           Web.Stripe.Util            ((</>))
-import           Web.Stripe.Types           (AccountBalance(..), CVC (..),
-                                             CardId (..), CardNumber (..),
-                                             CouponId (..), Created(..), Customer (..),
-                                             CustomerId (..), DefaultCard(..),
-                                             Description(..), Email (..),
-                                             EndingBefore(..), ExpMonth (..),
-                                             ExpYear (..), Limit(..), PlanId (..),
-                                             Quantity (..), MetaData(..),
-                                             mkNewCard, NewCard(..), StartingAfter(..),
-                                             StripeDeleteResult (..),
-                                             StripeList (..), TokenId (..),
-                                             TrialEnd(..), ExpandParams(..))
+import qualified Data.Text.Encoding       as TE
+import           Web.Stripe.StripeRequest (Method (DELETE, GET, POST),
+                                           StripeHasParam, StripeRequest (..),
+                                           StripeReturn, mkStripeRequest)
+import           Web.Stripe.Types         (AccountBalance (..), CVC (..),
+                                           CardId (..), CardNumber (..),
+                                           CouponId (..), Created (..),
+                                           Customer (..), CustomerId (..),
+                                           DefaultCard (..), Description (..),
+                                           Email (..), EndingBefore (..),
+                                           ExpMonth (..), ExpYear (..),
+                                           ExpandParams (..), Limit (..),
+                                           MetaData (..), NewCard (..),
+                                           PlanId (..), Quantity (..),
+                                           StartingAfter (..),
+                                           StripeDeleteResult (..),
+                                           StripeList (..), TokenId (..),
+                                           TrialEnd (..), mkNewCard)
 import           Web.Stripe.Types.Util
+import           Web.Stripe.Util          ((</>))
 
 ------------------------------------------------------------------------------
 -- | Create a customer
@@ -133,6 +137,15 @@ updateCustomer customerid = request
   where request = mkStripeRequest POST url params
         url     = "customers" </> getCustomerId customerid
         params  = []
+
+updateCustomerSource
+    :: CustomerId -- ^ `CustomerId` of `Customer` to update
+    -> TokenId
+    -> StripeRequest UpdateCustomer
+updateCustomerSource customerid (TokenId tokenId) = request
+  where request = mkStripeRequest POST url params
+        url     = "customers" </> getCustomerId customerid </> "sources"
+        params  = [("source", TE.encodeUtf8 tokenId)]
 
 data UpdateCustomer
 type instance StripeReturn UpdateCustomer = Customer

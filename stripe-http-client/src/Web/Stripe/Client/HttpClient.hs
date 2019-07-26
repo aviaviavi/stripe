@@ -1,5 +1,5 @@
-{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE CPP               #-}
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Web.Stripe.Client.HttpClient
@@ -22,28 +22,35 @@ module Web.Stripe.Client.HttpClient
 import qualified Control.Arrow
 import qualified Data.ByteString.Lazy     as BSL
 import           Data.Maybe
+import qualified Data.Text                as T
 import qualified Data.Text.Encoding       as TE
 import qualified Network.HTTP.Types       as Http
 
-import Data.Aeson               as A
-import Data.ByteString          (ByteString)
-import Data.Monoid              ((<>))
+import           Data.Aeson               as A
+import           Data.ByteString          (ByteString)
+import           Data.Monoid              ((<>))
 #if MIN_VERSION_http_client(0,5,13)
-import Network.HTTP.Client      as Http hiding (withManager, withConnection)
+import           Network.HTTP.Client      as Http hiding (withConnection,
+                                                   withManager)
 #else
-import Network.HTTP.Client      as Http hiding (withManager)
+import           Network.HTTP.Client      as Http hiding (withManager)
 #endif
-import Network.HTTP.Client.TLS  as TLS
+import           Network.HTTP.Client.TLS  as TLS
 
 import qualified Web.Stripe.StripeRequest as S
 
-import Web.Stripe.Client (APIVersion (..), StripeConfig (..),
-                          StripeError (..), StripeKey (..),
-                          defaultEndpoint, Endpoint (..),
-                          StripeRequest, StripeReturn,
-                          attemptDecode, handleStream,
-                          parseFail, toBytestring,
-                          unknownCode, Protocol (..))
+import           Web.Stripe.Client        (APIVersion (..), APIVersion (..),
+                                           Endpoint (..), Protocol (..),
+                                           StripeConfig (..), StripeConfig (..),
+                                           StripeError (..), StripeError (..),
+                                           StripeKey (..), StripeKey (..),
+                                           StripeRequest, StripeRequest,
+                                           StripeReturn, StripeReturn,
+                                           attemptDecode, attemptDecode,
+                                           defaultEndpoint, handleStream,
+                                           handleStream, parseFail, parseFail,
+                                           toBytestring, toBytestring,
+                                           unknownCode, unknownCode)
 
 
 -- | Create a request to 'Stripe's API.
@@ -118,17 +125,20 @@ callAPI man fromJSON' config stripeRequest = do
   where
     mkStripeRequest =
 
-        let req = Http.applyBasicAuth (getStripeKey (secretKey config)) mempty $
+        let host = (S.host stripeRequest)
+            path = TE.encodeUtf8 (S.endpoint stripeRequest)
+            accountIdHeader = maybeToList $ (\acc -> ("Stripe-Account", toBytestring acc)) <$> (S.connectedAccountId stripeRequest)
+            req = Http.applyBasicAuth (getStripeKey (secretKey config)) mempty $
                   defaultRequest {
                     Http.method = m2m (S.method stripeRequest)
                   , Http.secure = endpointProtocol (fromMaybe defaultEndpoint (stripeEndpoint config)) == HTTPS
                   , Http.host = endpointUrl $ fromMaybe defaultEndpoint (stripeEndpoint config)
                   , Http.port = endpointPort $ fromMaybe defaultEndpoint (stripeEndpoint config)
-                  , Http.path = "/v1/" <> TE.encodeUtf8 (S.endpoint stripeRequest)
+                  , Http.path = if ("connect" `T.isInfixOf` host) then path else "/v1/" <> path
                   , Http.requestHeaders = [
                         ("Stripe-Version", toBytestring stripeVersion)
                       , ("Connection", "Keep-Alive")
-                      ]
+                      ] ++ accountIdHeader
                   , Http.checkResponse = \_ _ -> return ()
                   }
 
@@ -161,4 +171,4 @@ urlEncodeBody headers req = req {
     body = pure (Http.renderSimpleQuery False headers)
 
 stripeVersion :: APIVersion
-stripeVersion = V20141007
+stripeVersion = V20190516
