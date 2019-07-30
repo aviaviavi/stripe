@@ -128,6 +128,14 @@ instance FromJSON TransferDestination where
    parseJSON (String x) = pure $ TransferDestination x
    parseJSON _          = mzero
 
+
+------------------------------------------------------------------------------
+
+newtype ChargeSource = ChargeSource Text deriving (Read, Show, Eq, Ord, Data, Typeable)
+instance FromJSON ChargeSource where
+   parseJSON (String x) = pure $ ChargeSource x
+   parseJSON _          = mzero
+
 ------------------------------------------------------------------------------
 -- | `Charge` object in `Stripe` API
 data Charge = Charge {

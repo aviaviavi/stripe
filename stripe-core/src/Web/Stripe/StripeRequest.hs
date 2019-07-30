@@ -51,9 +51,10 @@ import           Web.Stripe.Types    (AccountBalance (..), AccountNumber (..),
                                       AvailableOn (..), BankAccountId (..),
                                       CVC (..), CancelUrl (..), Capture (..),
                                       CardId (..), CardNumber (..),
-                                      ChargeId (..), Closed (..), Country (..),
-                                      CouponId (..), Created (..),
-                                      Currency (..), CustomerId (..), Date (..),
+                                      ChargeId (..), ChargeSource (..),
+                                      Closed (..), Country (..), CouponId (..),
+                                      Created (..), Currency (..),
+                                      CustomerId (..), Date (..),
                                       DefaultCard (..), Description (..),
                                       Duration (..), DurationInMonths (..),
                                       Email (..), EndingBefore (..),
@@ -381,6 +382,10 @@ instance ToStripeParam a => ToStripeParam (Source a) where
     case toStripeParam param [] of
       [(_, p)] -> (("source", p) :)
       _        -> error "source applied to non-singleton"
+
+instance ToStripeParam ChargeSource where
+  toStripeParam (ChargeSource s) =
+    (("source", Text.encodeUtf8 s) :)
 
 instance ToStripeParam SubscriptionId where
   toStripeParam (SubscriptionId sid) =
