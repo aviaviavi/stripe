@@ -2595,6 +2595,20 @@ instance FromJSON PaymentId where
    parseJSON (String x) = pure $ PaymentId x
    parseJSON _          = mzero
 
+
+------------------------------------------------------------------------------
+
+data AccountLoginLink = AccountLoginLink {
+  accountLoginLinkUrl     :: Text,
+  accountLoginLinkCreated :: UTCTime
+                                         } deriving (Show, Eq)
+
+instance FromJSON AccountLoginLink where
+   parseJSON (Object o) =
+     AccountLoginLink <$> o .: "url"
+                      <*> (fromSeconds <$> o .: "created")
+   parseJSON _ = mzero
+
 ------------------------------------------------------------------------------
 -- | Show an amount accounting for zero currencies
 --
