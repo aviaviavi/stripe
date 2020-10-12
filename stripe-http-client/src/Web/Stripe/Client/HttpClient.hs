@@ -39,18 +39,13 @@ import           Network.HTTP.Client.TLS  as TLS
 
 import qualified Web.Stripe.StripeRequest as S
 
-import           Web.Stripe.Client        (APIVersion (..), APIVersion (..),
-                                           Endpoint (..), Protocol (..),
-                                           StripeConfig (..), StripeConfig (..),
-                                           StripeError (..), StripeError (..),
-                                           StripeKey (..), StripeKey (..),
-                                           StripeRequest, StripeRequest,
-                                           StripeReturn, StripeReturn,
-                                           attemptDecode, attemptDecode,
-                                           defaultEndpoint, handleStream,
-                                           handleStream, parseFail, parseFail,
-                                           toBytestring, toBytestring,
-                                           unknownCode, unknownCode)
+import           Web.Stripe.Client        (APIVersion (..), Endpoint (..),
+                                           Protocol (..), StripeConfig (..),
+                                           StripeError (..), StripeKey (..),
+                                           StripeRequest, StripeReturn,
+                                           attemptDecode, defaultEndpoint,
+                                           handleStream, handleStream,
+                                           parseFail, toBytestring, unknownCode)
 
 
 -- | Create a request to 'Stripe's API.
